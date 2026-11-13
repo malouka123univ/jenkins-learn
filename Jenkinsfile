@@ -5,6 +5,10 @@ pipeline {
         timestamps()
     }
 
+    environment {
+        VERSION = '1.2.e'
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -14,7 +18,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                echo 'Add your project build command here.'
+                echo "Building version ${VERSION}"
             }
         }
 
