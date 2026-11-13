@@ -26,11 +26,14 @@ pipeline {
     }
 
     post {
+        always {
+            echo 'Le pipeline est terminé (toujours exécuté).'
+        }
         success {
-            echo 'Pipeline completed successfully.'
+            echo 'Le build a réussi.'
         }
         failure {
-            echo 'Pipeline failed.'
+            echo 'Le build a échoué.'
         }
     }
 }
