@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    tools {
+        maven 'Maven'
+    }
+
     options {
         timestamps()
     }
@@ -19,6 +23,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo "Building version ${VERSION}"
+                sh 'mvn clean install'
             }
         }
 
