@@ -1,3 +1,5 @@
+def gv
+
 pipeline {
     agent any
 
@@ -22,10 +24,19 @@ pipeline {
             }
         }
 
+        stage('Init') {
+            steps {
+                script {
+                    gv = load 'script.groovy'
+                }
+            }
+        }
+
         stage('Build') {
             steps {
-                echo "Building version ${params.VERSION}"
-                sh "mvn clean install ${params.executeTests ? '' : '-DskipTests'}"
+                script {
+                    gv.buildApp()
+                }
             }
         }
 
@@ -34,7 +45,9 @@ pipeline {
                 expression { params.executeTests }
             }
             steps {
-                echo 'Testing the application.'
+                script {
+                    gv.testApp()
+                }
             }
         }
 
@@ -43,18 +56,8 @@ pipeline {
                 expression { env.BRANCH_NAME == 'dev' }
             }
             steps {
-                echo "Deploying version ${params.VERSION}"
-                withCredentials([usernamePassword(
-                    credentialsId: 'server-credentials',
-                    usernameVariable: 'DEPLOY_USER',
-                    passwordVariable: 'DEPLOY_PASSWORD'
-                )]) {
-                    sh '''
-                        echo "Connexion au serveur de dev..."
-                        # Ajoutez ici la commande de déploiement.
-                        # DEPLOY_USER et DEPLOY_PASSWORD sont disponibles dans cet environnement.
-                        # Ne jamais afficher le mot de passe.
-                    '''
+                script {
+                    gv.deployApp()
                 }
             }
         }
