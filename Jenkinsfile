@@ -30,6 +30,26 @@ pipeline {
                 echo 'Add your project test command here.'
             }
         }
+
+        stage('Deploy') {
+            when {
+                expression { env.BRANCH_NAME == 'dev' }
+            }
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'server-credentials',
+                    usernameVariable: 'DEPLOY_USER',
+                    passwordVariable: 'DEPLOY_PASSWORD'
+                )]) {
+                    sh '''
+                        echo "Connexion au serveur de dev..."
+                        # Ajoutez ici la commande de déploiement.
+                        # DEPLOY_USER et DEPLOY_PASSWORD sont disponibles dans cet environnement.
+                        # Ne jamais afficher le mot de passe.
+                    '''
+                }
+            }
+        }
     }
 
     post {
