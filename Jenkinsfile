@@ -5,12 +5,14 @@ pipeline {
         maven 'Maven'
     }
 
-    options {
-        timestamps()
+    parameters {
+        string(name: 'VERSION', defaultValue: '1.2.0', description: 'Version à déployer')
+        choice(name: 'VERSIONS', choices: ['1.0.0', '1.1.0', '1.2.0'], description: 'Versions disponibles')
+        booleanParam(name: 'executeTests', defaultValue: true, description: 'Exécuter les tests ?')
     }
 
-    environment {
-        VERSION = '1.2.e'
+    options {
+        timestamps()
     }
 
     stages {
@@ -22,17 +24,17 @@ pipeline {
 
         stage('Build') {
             steps {
-                echo "Building version ${VERSION}"
-                sh 'mvn clean install'
+                echo "Building version ${params.VERSION}"
+                sh "mvn clean install ${params.executeTests ? '' : '-DskipTests'}"
             }
         }
 
         stage('Test') {
             when {
-                expression { env.BRANCH_NAME == 'dev' }
+                expression { params.executeTests }
             }
             steps {
-                echo 'Add your project test command here.'
+                echo 'Testing the application.'
             }
         }
 
@@ -41,6 +43,7 @@ pipeline {
                 expression { env.BRANCH_NAME == 'dev' }
             }
             steps {
+                echo "Deploying version ${params.VERSION}"
                 withCredentials([usernamePassword(
                     credentialsId: 'server-credentials',
                     usernameVariable: 'DEPLOY_USER',
